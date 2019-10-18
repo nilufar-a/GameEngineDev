@@ -1,0 +1,106 @@
+{
+    "$schema": "http://json-schema.org/draft-04/schema",
+
+    "definitions": {
+        "point": {
+            "description": "stores x and y coordinates",
+            "type" : "object",
+            "properties": {
+                "xCoor" : { "type":"integer" },
+                "yCoor" : { "type":"integer" }
+            },
+            "required" : ["xCoor","yCoor"]
+        },
+        "player": {
+            "description": "stores the player data",
+            "type" : "object",
+            "properties": {
+                "color" : {
+                    "description": "the color of the player",
+                    "type" : "string"                   
+                },
+                "id" : {
+                    "description": "Player Identifier",
+                    "type" : "integer"
+                },
+                "headPosition": { "$ref" : "#/defitions/point" },
+                "tracer" :{
+                    "description": "the line that the player leaves behind",
+                    "type" :"array",
+                    "items": { "$ref" : "#/defitions/point" }
+                } ,
+                "turboAmount" : {
+                    "description": "the number of turbo powerups",
+                    "type" : "integer"                
+                },
+                "numberOfKills" : { 
+                    "description": "the number of kills made by the player",
+                    "type" : "integer"
+                },
+                "timeElapsed" : { 
+                    "description": "the time elapsed so far",
+                    "type" : "number"
+                },
+                "length" : {
+                    "description": "the length of player in the game",
+                    "type" : "integer"
+                },
+                "score" : {
+                    "description": "The score defined by the predefined formula",
+                    "type" : "number"
+                }
+            }
+        }
+    },
+
+    "title": "GameState",
+    "description": "Current state of the game",
+    "type" : "object",
+    "properties": 
+    {
+        "map" : 
+        {
+            "description": "Current map of the game with the all obstacles, power-ups and player locations",
+            "type" : "object",
+            "properties": 
+            {
+                "width" :
+                {
+                    "description": "The width of the map",
+                    "type" : "integer",
+                    "minimum": 16,
+                    "maximum": 128
+                },
+                "height" : 
+                {
+                    "description": "The height of the map",
+                    "type" : "integer",
+                    "minimum": 16,
+                    "maximum": 128
+                },
+                "obstacles":
+                {
+                    "description": "The Location of the obstacles",
+                    "type" : "array",
+                    "items": { "$ref": "#/definitions/point" }                    
+                },
+                "power-ups":
+                {
+                    "description": "The location of the powerups",
+                    "type" : "array",
+                    "items": { "$ref" : "#/defitions/point" }
+                }                
+            }
+        },
+        "players" :
+        {
+            "description": "The player",
+            "type" : "array",
+            "items" : { "$ref" : "#/definitions/player" }   
+        }
+    }
+}
+
+
+
+
