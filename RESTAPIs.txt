@@ -12,7 +12,7 @@ ERR: 500="InternalServerError"
 
 GET getcurrentStateOfMOdel
 IN: int GameID
-OUT: 200 "OK" "GameState" -> JSON file  //(sample.JSON)
+OUT: 200 "OK" "GameState" -> JSON file (JSON-Schema for representation purposes)
 
 
 POST CreateGame
