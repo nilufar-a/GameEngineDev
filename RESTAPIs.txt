@@ -1,6 +1,6 @@
 
 POST  PostMove
-IN: enum Direction, int UserID, boolean TurboFlag
+IN: string Direction, int UserID, boolean TurboFlag
 OUT: 200= "OK" 
 ERR: 500="InternalServerError"
      400= "No Game Found"

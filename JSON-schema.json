@@ -3,14 +3,13 @@
 
     "definitions": {
         "point": {
-            "description": "stores x and y coordinates and the state of the point",
+            "description": "stores x and y coordinates",
             "type" : "object",
             "properties": {
-                "x" : { "type":"integer" },
-                "y" : { "type":"integer" },
-                "state":{"enum":["empty","obstacle","powerup","tracer"] }
+                "xCoor" : { "type":"integer" },
+                "yCoor" : { "type":"integer" }
             },
-            "required" : ["x","y"]
+            "required" : ["xCoor","yCoor"]
         },
         "player": {
             "description": "stores the player data",
@@ -18,20 +17,13 @@
             "properties": {
                 "color" : {
                     "description": "the color of the player",
-                    "type" : "string",  
-                    "enum" :["white","yellow","orange","red","pink","purple","blue","green","brown","grey","black"]            
+                    "type" : "string"                   
                 },
                 "id" : {
                     "description": "Player Identifier",
                     "type" : "integer"
                 },
                 "headPosition": { "$ref" : "#/defitions/point" },
-              
-                "direction" :{
-                    "description": "the direction that the player was moving according to the last turn",
-                    "enum":["up","down","left","right"]
-                }, 
-               
                 "tracer" :{
                     "description": "the line that the player leaves behind",
                     "type" :"array",
@@ -77,14 +69,14 @@
                     "description": "The width of the map",
                     "type" : "integer",
                     "minimum": 16,
-                    "maximum": 64
+                    "maximum": 128
                 },
                 "height" : 
                 {
                     "description": "The height of the map",
                     "type" : "integer",
                     "minimum": 16,
-                    "maximum": 64
+                    "maximum": 128
                 },
                 "obstacles":
                 {
@@ -97,20 +89,7 @@
                     "description": "The location of the powerups",
                     "type" : "array",
                     "items": { "$ref" : "#/defitions/point" }
-                },                
-                "tracers":{
-                    "description": "The locations of the tracers on the map",
-                    "type" : "array",
-                    "items": { "$ref" : "#/defitions/point" }
-                },
-                "allPointsOnMap":
-                {
-                    "description" : "All of the points that are on the map with the information about the states stored inside the individual points",
-                     "type" : "array",
-                     "items":{"$ref" : "/#definitions/point" }
-                }   
-            
-            
+                }                
             }
         },
         "players" :
@@ -121,3 +100,7 @@
         }
     }
 }
+
+
+
+
