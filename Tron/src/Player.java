@@ -1,39 +1,68 @@
+package engine;
+
+import com.google.gson.annotations.Expose;
+import com.google.gson.annotations.SerializedName;
+
 import java.util.ArrayList;
 import java.util.List;
 
-enum  Direction{
-    LEFT,RIGHT,UP,DOWN
+
+enum Direction {
+    LEFT, RIGHT, UP, DOWN
 }
 
 public class Player {
+    //   @SerializedName(value = "color")
+    @Expose
     private String color;
-    private final int ID;  //Can be string and parsed to be int, will decide later
+    //  @SerializedName(value = "id")
+    @Expose
+    private final String ID;  //Can be string and parsed to be int, will decide later
+    //  @SerializedName(value = "headPosition")
+    @Expose
     private Point headPosition;
+    //  @SerializedName(value = "tracer")
+    @Expose
     private List<Point> tracer; //Will save the tracers on map, this will be used to check if the player killed somebody
+    // @SerializedName(value = "turboAmount")
+    @Expose
     private int turboAmount;
+    //   @SerializedName(value = "numberOfKills")
+    @Expose
     private int numberOfKills;
+    //    @SerializedName(value = "timeElapsed")
+    @Expose
     private double timeElapsed; //Survival time
+    //    @SerializedName(value = "length")
+    @Expose
     private int length;
+    //    @SerializedName(value = "score")
+    @Expose
     private double score;
+    @SerializedName(value = "direction")
+    @Expose
     private Direction currentDirection;
+    private boolean turboFlag;
+    private Game playingGame;
 
 
-    public Player(String color, int ID) {
+    public Player(String color, String ID) {
         this.color = color;
         this.ID = ID;
-        this.tracer=new ArrayList<>();
-        this.turboAmount=3;
-        this.numberOfKills=0;
-        this.timeElapsed=0;
-        this.length=0;
-        this.score=0;
+        this.tracer = new ArrayList<>();
+        this.turboAmount = 3;
+        this.numberOfKills = 0;
+        this.timeElapsed = 0;
+        this.length = 0;
+        this.score = 0;
+        this.currentDirection = Direction.UP;
     }
 
     public String getColor() {
         return color;
     }
 
-    public int getID() {
+    public String getID() {
         return ID;
     }
 
@@ -64,201 +93,267 @@ public class Player {
     public double getScore() {
         return score;
     }
-    void increaseTurbo(){
+
+    public void setScore(double score) {
+        this.score = score;
+    }
+
+    public Game getPlayingGame() {
+        return playingGame;
+    }
+
+    public void setPlayingGame(Game playingGame) {
+        this.playingGame = playingGame;
+    }
+
+    void setHeadPosition(Point position) {
+        headPosition = position;
+    }
+
+    void increaseTurbo() {
         turboAmount++;
     }
 
-    boolean movePlayer(Direction direction, GameMap map){
+    public Direction getCurrentDirection() {
+        return currentDirection;
+    }
+
+    public void setCurrentDirection(Direction currentDirection) {
+        this.currentDirection = currentDirection;
+    }
+
+    public boolean isTurboFlag() {
+        return turboFlag;
+    }
+
+    public void setTurboFlag(boolean turboFlag) {
+        this.turboFlag = turboFlag;
+    }
+
+    boolean movePlayer(Direction direction, GameMap map) {
         tracer.add(headPosition);
-        if(this.currentDirection==Direction.UP){
-             if(direction==Direction.UP || direction==Direction.DOWN){
-               if(headPosition.getX()==0){
+        if (this.currentDirection == Direction.UP) {
+            if (direction == Direction.UP || direction == Direction.DOWN) {
+                if (headPosition.getX() == 0) {
 
-                  return false; // Player dies by intersecting with upper border
 
-               }
+                    return false; // engine.Player dies by intersecting with upper border
 
-                int nextX=headPosition.getX();
-                headPosition.setX(nextX-1);
-                length++;
-                //Won't change the currentDirection
-                return true;
+                }
 
-             }
-           if(direction==Direction.LEFT){
-               if(headPosition.getY()==0){
-
-                   map.die(this); //Player dies by intersecting with map border
-
-               }
-
-               int nextY=headPosition.getY();
-               headPosition.setY(nextY-1);
-               currentDirection=direction;
-               length++;
-               return true;
-
-           }
-           if (direction==Direction.RIGHT){
-                    if(headPosition.getY()==map.getWidth()-1){
-
-                        return false;  //Player dies by intersecting with map border
-
-                    }
-
-                    int nextY=headPosition.getY();
-                    headPosition.setY(nextY+1);
-                    currentDirection=direction;
+                int nextX = headPosition.getX() - 1;
+                Point nextPoint = playingGame.getGameMap().getPointOnXY(nextX, headPosition.getY());
+                if (nextPoint != null) {
+                    headPosition = nextPoint;
                     length++;
-                    return true;
-
-           }
-
-        }
-
-        if(this.currentDirection==Direction.RIGHT){
-            if (direction==Direction.RIGHT ||direction==Direction.LEFT){
-                if(headPosition.getY()==map.getWidth()-1){
-
-                    return false;   // Player dies by intersecting with right border
-
                 }
-                int nextY=headPosition.getY();
-                headPosition.setY(nextY+1);
                 //Won't change the currentDirection
-                length++;
                 return true;
 
             }
+            if (direction == Direction.LEFT) {
+                if (headPosition.getY() == 0) {
 
-            if (direction== Direction.UP){
-                if(headPosition.getX()==0){
-
-                    return false; // Player dies by intersecting with upper border
-
+                    // map.die(this); //engine.Player dies by intersecting with map border
+                    return false;
                 }
 
-                int nextX=headPosition.getX();
-                headPosition.setX(nextX-1);
-                currentDirection=direction;
-                length++;
+                int nextY = headPosition.getY() - 1;
+                Point nextPoint = playingGame.getGameMap().getPointOnXY(headPosition.getX(), nextY);
+                if (nextPoint != null) {
+                    headPosition = nextPoint;
+                    length++;
+                }
+                currentDirection = direction;
                 return true;
-
 
             }
-            if(direction== Direction.DOWN){
-                if(headPosition.getX()==map.getHeight()-1){
+            if (direction == Direction.RIGHT) {
+                if (headPosition.getY() == map.getWidth() - 1) {
 
-                    return false;      // Player dies by intersecting with upper border
+                    return false;  //engine.Player dies by intersecting with map border
 
                 }
 
-                int nextX=headPosition.getX();
-                headPosition.setX(nextX+1);
-                currentDirection=direction;
-                length++;
+                int nextY = headPosition.getY() + 1;
+                Point nextPoint = playingGame.getGameMap().getPointOnXY(headPosition.getX(), nextY);
+                if (nextPoint != null) {
+                    headPosition = nextPoint;
+                    length++;
+                }
+                currentDirection = direction;
                 return true;
-
 
             }
 
         }
-        if(currentDirection==Direction.LEFT){
-              if (direction==Direction.LEFT ||direction==Direction.RIGHT){
-                  if(headPosition.getY()==0){
 
-                      return false;    //Player dies intersecting the left border
+        if (this.currentDirection == Direction.RIGHT) {
+            if (direction == Direction.RIGHT || direction == Direction.LEFT) {
+                if (headPosition.getY() == map.getWidth() - 1) {
 
-                  }
-
-              }
-              if(direction== Direction.UP){
-                  if(headPosition.getX()==0){
-
-                      return false;  // Player dies by intersecting with upper border
-
-                  }
-
-                  int nextX=headPosition.getX();
-                  headPosition.setX(nextX-1);
-                  currentDirection=direction;
-                  length++;
-                  return true;
-
-
-              }
-              if(direction== Direction.DOWN){
-                  if(headPosition.getX()==map.getHeight()-1){
-
-                      return false;   // Player dies by intersecting with upper border
-
-                  }
-
-                  int nextX=headPosition.getX();
-                  headPosition.setX(nextX+1);
-                  currentDirection=direction;
-                  length++;
-                  return true;
-              }
-        }
-
-        if(currentDirection== Direction.DOWN){
-            if (direction==Direction.DOWN || direction==Direction.UP){
-                if(headPosition.getX()==map.getHeight()){
-
-                    return false;   // Player dies by intersecting with upper border
+                    return false;   // engine.Player dies by intersecting with right border
 
                 }
-
-                int nextX=headPosition.getX();
-                headPosition.setX(nextX+1);
+                int nextY = headPosition.getY() + 1;
+                Point nextPoint = playingGame.getGameMap().getPointOnXY(headPosition.getX(), nextY);
+                if (nextPoint != null) {
+                    headPosition = nextPoint;
+                    length++;
+                }
                 //Won't change the currentDirection
-                length++;
                 return true;
-            }
-            if (direction== Direction.RIGHT)
-            {
-                if(headPosition.getY()==map.getWidth()){
 
-                    return false;  //Player dies by intersecting with map border
+            }
+
+            if (direction == Direction.UP) {
+                if (headPosition.getX() == 0) {
+
+                    return false; // engine.Player dies by intersecting with upper border
 
                 }
 
-                int nextY=headPosition.getY();
-                headPosition.setY(nextY+1);
-                currentDirection=direction;
-                length++;
+                int nextX = headPosition.getX() - 1;
+                Point nextPoint = playingGame.getGameMap().getPointOnXY(nextX, headPosition.getY());
+                if (nextPoint != null) {
+                    headPosition = nextPoint;
+                    length++;
+                }
+                currentDirection = direction;
                 return true;
-            }
-            if (direction== Direction.LEFT)
-            {
-                if(headPosition.getY()==0){
 
-                    return false;     //Player dies by intersecting with map border
+
+            }
+            if (direction == Direction.DOWN) {
+                if (headPosition.getX() == map.getHeight() - 1) {
+
+                    return false;      // engine.Player dies by intersecting with upper border
 
                 }
 
-                int nextY=headPosition.getY();
-                headPosition.setY(nextY-1);
-                currentDirection=direction;
-                length++;
+                int nextX = headPosition.getX() + 1;
+                Point nextPoint = playingGame.getGameMap().getPointOnXY(nextX, headPosition.getY());
+                if (nextPoint != null) {
+                    headPosition = nextPoint;
+                    length++;
+                }
+                currentDirection = direction;
                 return true;
 
+
+            }
+
+        }
+        if (currentDirection == Direction.LEFT) {
+            if (direction == Direction.LEFT || direction == Direction.RIGHT) {
+                if (headPosition.getY() == 0) {
+
+                    return false;    //engine.Player dies intersecting the left border
+
+                }
+                int nextY = headPosition.getY() - 1;
+                Point nextPoint = playingGame.getGameMap().getPointOnXY(headPosition.getX(), nextY);
+                if (nextPoint != null) {
+                    headPosition = nextPoint;
+                    length++;
+                }
+
+                return true;
+            }
+            if (direction == Direction.UP) {
+                if (headPosition.getX() == 0) {
+
+                    return false;  // engine.Player dies by intersecting with upper border
+
+                }
+
+                int nextX = headPosition.getX() - 1;
+                Point nextPoint = playingGame.getGameMap().getPointOnXY(nextX, headPosition.getY());
+                if (nextPoint != null) {
+                    headPosition = nextPoint;
+                    length++;
+                }
+                currentDirection = direction;
+                return true;
+
+
+            }
+            if (direction == Direction.DOWN) {
+                if (headPosition.getX() == map.getHeight() - 1) {
+
+                    return false;   // engine.Player dies by intersecting with upper border
+
+                }
+
+                int nextX = headPosition.getX() + 1;
+                Point nextPoint = playingGame.getGameMap().getPointOnXY(nextX, headPosition.getY());
+                if (nextPoint != null) {
+                    headPosition = nextPoint;
+                    length++;
+                }
+                currentDirection = direction;
+                return true;
             }
         }
-         return false;
-    }
 
-    public List<Point> die(){
-        tracer.add(headPosition);
-        return tracer;
-    }
-   public boolean intersect(Point point){
-        if (point.getState()==State.OBSTACLE || point.getState()== State.TRACER) {
-            return true;
+        if (currentDirection == Direction.DOWN) {
+            if (direction == Direction.DOWN || direction == Direction.UP) {
+                if (headPosition.getX() == map.getHeight()) {
+
+                    return false;   // engine.Player dies by intersecting with upper border
+
+                }
+
+                int nextX = headPosition.getX() + 1;
+                Point nextPoint = playingGame.getGameMap().getPointOnXY(nextX, headPosition.getY());
+                if (nextPoint != null) {
+                    headPosition = nextPoint;
+                    length++;
+                }
+                //Won't change the currentDirection
+                return true;
+            }
+            if (direction == Direction.RIGHT) {
+                if (headPosition.getY() == map.getWidth()) {
+
+                    return false;  //engine.Player dies by intersecting with map border
+
+                }
+
+                int nextY = headPosition.getY() + 1;
+                Point nextPoint = playingGame.getGameMap().getPointOnXY(headPosition.getX(), nextY);
+                if (nextPoint != null) {
+                    headPosition = nextPoint;
+                    length++;
+                }
+                currentDirection = direction;
+                return true;
+            }
+            if (direction == Direction.LEFT) {
+                if (headPosition.getY() == 0) {
+
+                    return false;     //engine.Player dies by intersecting with map border
+
+                }
+
+                int nextY = headPosition.getY() - 1;
+                Point nextPoint = playingGame.getGameMap().getPointOnXY(headPosition.getX(), nextY);
+                if (nextPoint != null) {
+                    headPosition = nextPoint;
+                    length++;
+                }
+                currentDirection = direction;
+                return true;
+
+            }
         }
         return false;
-   }
+    }
+
+    public List<Point> die() {
+        return tracer;
+    }
+
 }
 
 
