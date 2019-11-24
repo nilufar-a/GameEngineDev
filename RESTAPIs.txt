@@ -15,9 +15,7 @@ IN: int GameID
 OUT: 200 "OK" "GameState" -> JSON file (JSON-Schema for representation purposes)
 
 
-POST CreateGame
-IN: int GameID, ListOfUserIDs {
-                    int UserID
-                  }
+POST PostCreateGame
+IN: int GameID
 OUT: 200="OK"
 ERR: 500="InternalServerError"
