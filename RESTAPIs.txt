@@ -10,7 +10,7 @@ ERR: 500="InternalServerError"
      404= "Illegal Move"
 
 
-GET getcurrentStateOfMOdel
+GET GetCurrentStateOfModel
 IN: int GameID
 OUT: 200 "OK" "GameState" -> JSON file (JSON-Schema for representation purposes)
 
