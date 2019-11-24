@@ -58,6 +58,16 @@
     "type" : "object",
     "properties": 
     {
+        "timeToUpdate" : {
+            "description": "Time left until the next turn",
+            "type" : "number"
+        },
+
+        "turnCounter": {
+            "description": "Current turn number",
+            "type" : "integer"
+        },
+       
         "map" : 
         {
             "description": "Current map of the game with the all obstacles, power-ups and player locations",
