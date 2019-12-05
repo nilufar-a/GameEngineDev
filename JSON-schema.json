@@ -1,13 +1,14 @@
 {
-    "$schema": "http://json-schema.org/draft-04/schema",
+    "$schema": "http://json-schema.org/draft-06/schema",
 
     "definitions": {
         "point": {
-            "description": "stores x and y coordinates",
+            "description": "stores x and y coordinates and the state of the point",
             "type" : "object",
             "properties": {
                 "x" : { "type":"integer" },
-                "y" : { "type":"integer" }
+                "y" : { "type":"integer" },
+                "state":{"enum":["empty","obstacle","powerup","tracer"] }
             },
             "required" : ["x","y"]
         },
@@ -17,13 +18,19 @@
             "properties": {
                 "color" : {
                     "description": "the color of the player",
-                    "type" : "string"                   
+                    "type" : "string",  
+                    "enum" :["white","yellow","orange","red","pink","purple","blue","green","brown","grey","black"]            
                 },
                 "id" : {
                     "description": "Player Identifier",
-                    "type" : "integer"
+                    "type" : "string"
                 },
                 "headPosition": { "$ref" : "#/definitions/point" },
+              
+                "direction" :{
+                    "description": "the direction that the player was moving according to the last turn",
+                    "enum":["up","down","left","right"]
+                },               
                 "tracer" :{
                     "description": "the line that the player leaves behind",
                     "type" :"array",
@@ -49,34 +56,30 @@
                     "description": "The score defined by the predefined formula",
                     "type" : "number"
                 },
-                "isAlive":{
-                    "description": "Players is alive or not",
-                    "type": "boolean"
+                "isAlive":{	
+                    "description": "Players is alive or not",	
+                    "type": "boolean"	
                 }
             }
         }
     },
-
     "title": "GameState",
     "description": "Current state of the game",
     "type" : "object",
     "properties": 
     {
-        "timeToUpdate" : {
-            "description": "Time left until the next turn",
-            "type" : "number"
+        "timeToUpdate" : {	
+            "description": "Time left until the next turn",	
+            "type" : "number"	
+        },	
+        "turnCounter": {	
+            "description": "Current turn number",	
+            "type" : "integer"	
+        },	
+        "gameFinished":{	
+         "description": "Is the game running or has it finished",	
+         "type":"boolean"	
         },
-
-        "turnCounter": {
-            "description": "Current turn number",
-            "type" : "integer"
-        },
-        "gameFinished":{
-         "description": "Is the game running or has it finished",
-         "type":"boolean"
-        },
-
-
         "map" : 
         {
             "description": "Current map of the game with the all obstacles, power-ups and player locations",
@@ -88,14 +91,14 @@
                     "description": "The width of the map",
                     "type" : "integer",
                     "minimum": 16,
-                    "maximum": 128
+                    "maximum": 64
                 },
                 "height" : 
                 {
                     "description": "The height of the map",
                     "type" : "integer",
                     "minimum": 16,
-                    "maximum": 128
+                    "maximum": 64
                 },
                 "obstacles":
                 {
@@ -108,10 +111,20 @@
                     "description": "The location of the powerups",
                     "type" : "array",
                     "items": { "$ref" : "#/definitions/point" }
-                }                
+                },                
+                "tracers":{
+                    "description": "The locations of the tracers on the map",
+                    "type" : "array",
+                    "items": { "$ref" : "#/definitions/point" }
+                },
+                "allPointsOnMap":
+                {
+                    "description" : "All of the points that are on the map with the information about the states stored inside the individual points",
+                     "type" : "array",
+                     "items":{"$ref" : "#/definitions/point" }
+                }   
             }
         },
-        
         "players" :
         {
             "description": "The player",
@@ -120,7 +133,3 @@
         }
     }
 }
-
-
-
-
