@@ -6,10 +6,10 @@
             "description": "stores x and y coordinates",
             "type" : "object",
             "properties": {
-                "xCoor" : { "type":"integer" },
-                "yCoor" : { "type":"integer" }
+                "x" : { "type":"integer" },
+                "y" : { "type":"integer" }
             },
-            "required" : ["xCoor","yCoor"]
+            "required" : ["x","y"]
         },
         "player": {
             "description": "stores the player data",
