@@ -155,10 +155,11 @@ public class GameMap {
             move(direction, player);
             calculateScore(player);
         } else {
-            for (int i = 0; i < 2; i++) {
+            for (int i = 0; i < 3; i++) {
                 move(direction, player);
                 calculateScore(player);
             }
+            player.setTurboFlag(false);
         }
     }
 
@@ -221,6 +222,9 @@ public class GameMap {
         deadPlayers.add(player); //Will use to get  who killed who
         //Need to implement score stuff and return here
         game.setListOfPlayers(playerList);
+        if(playerList.size()==0){
+            game.setGameFinished(true);
+        }
     }
 
     public void calculateScore(Player player) {

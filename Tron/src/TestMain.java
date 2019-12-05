@@ -42,8 +42,11 @@ public class TestMain {
         game1.move(Direction.RIGHT, player1, false);
         //game2.move(Direction.DOWN,player5,false);
         //game1.move(Direction.LEFT, player1, false);
-        Thread.sleep(1600);
-        game1.move(Direction.UP,player2,false);
+        Thread.sleep(10000);
+        game1.move(Direction.RIGHT,player1,false);
+        game1.move(Direction.RIGHT, player2, true);
+        Thread.sleep(500);
+        System.out.println(game1.getTimeToUpdate());
         Thread.sleep(1500);
         //game1.move(Direction.RIGHT, player3, false);
 

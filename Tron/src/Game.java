@@ -23,8 +23,8 @@ public class Game extends Thread {
     @Expose
     private double timeToUpdate;
     private Thread thread;
+    private boolean gameStarted;
     private boolean gameFinished;
-    private Player currentPlayer;
 
     private Runnable taskTurn;
     private ScheduledFuture<?> scheduledFuture;
@@ -38,39 +38,44 @@ public class Game extends Thread {
         this.gameMap.setGame(this);
         this.listOfPlayers = listOfPlayers;
         for (Player p: this.listOfPlayers
-             ) {
+        ) {
             p.setPlayingGame(this);
         }
         timeToUpdate = 3.00;
         gameFinished = false;
-        currentPlayer = listOfPlayers.get(0);
         thread = new Thread(this,Integer.toString(gameID));
         thread.start();
         System.out.println(this.gameMap.toString());
     }
 
     public void run(){
-        System.out.println(gameID+" is created......");
-        AtomicInteger playerCounter= new AtomicInteger(0);
-        currentPlayer = listOfPlayers.get(playerCounter.get());
-        System.out.println(gameID + ": Turn of "+currentPlayer.getID());
-        ScheduledExecutorService ses = Executors.newScheduledThreadPool(1);
+        try {
+            System.out.println(gameID + " is created......");
+            AtomicInteger playerCounter = new AtomicInteger(0);
+            ScheduledExecutorService ses = Executors.newScheduledThreadPool(1);
 
-        taskTurn = () -> {
-            gameMap.move(currentPlayer.getCurrentDirection(),currentPlayer, turboFlag);
-            //System.out.println(gameID +": "+ currentPlayer.getID()+" moved in the direction of "+currentPlayer.getCurrentDirection().toString());
-            System.out.println(this.gameMap.toString());
-            playerCounter.getAndIncrement();
-            if(playerCounter.get()>=listOfPlayers.size()){
-                playerCounter.set(0);
+            taskTurn = () -> {
+                ArrayList<Player> temp= (ArrayList<Player>) listOfPlayers.clone();
+                for (Player player : temp
+                ) {
+                    gameMap.move(player.getCurrentDirection(), player, player.isTurboFlag());
+                }
+                System.out.println(this.gameMap.toString());
+            };
+
+            //Time for synchronization
+            Thread.sleep(10000);
+            gameStarted=true;
+
+            scheduledFuture = ses.scheduleAtFixedRate(taskTurn, 1500, 1500, TimeUnit.MILLISECONDS);
+            while (!gameFinished) {
+                timeToUpdate = scheduledFuture.getDelay(TimeUnit.MILLISECONDS);
             }
-            currentPlayer = listOfPlayers.get(playerCounter.get());
-            //System.out.println("Turn of "+currentPlayer.getID());
-        };
-
-        scheduledFuture = ses.scheduleAtFixedRate(taskTurn,1500,1500, TimeUnit.MILLISECONDS);
-        while(!gameFinished){
-            timeToUpdate=scheduledFuture.getDelay(TimeUnit.MILLISECONDS);
+            scheduledFuture.cancel(false);
+            System.out.println("Game Finished");
+        }
+        catch (Exception ex){
+            System.out.println(ex.getStackTrace());
         }
     }
 
@@ -82,13 +87,6 @@ public class Game extends Thread {
         this.gameID = gameID;
     }
 
-    public Player getCurrentPlayer() {
-        return currentPlayer;
-    }
-
-    public void setCurrentPlayer(Player currentPlayer) {
-        this.currentPlayer = currentPlayer;
-    }
 
     public boolean isGameFinished() {
         return gameFinished;
@@ -127,7 +125,7 @@ public class Game extends Thread {
 
 
     public void move(Direction direction, Player player, boolean turboFlag) {
-        if(player.getID().equals(currentPlayer.getID())){
+        if(gameStarted) {
             player.setCurrentDirection(direction);
             player.setTurboFlag(turboFlag);
         }

@@ -3,6 +3,7 @@ package engine;
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -42,6 +43,10 @@ public class Player {
     @SerializedName(value = "direction")
     @Expose
     private Direction currentDirection;
+    @SerializedName(value="isAlive")
+    @Expose
+    private boolean isAlive = true;
+
     private boolean turboFlag;
     private Game playingGame;
 
@@ -351,13 +356,8 @@ public class Player {
     }
 
     public List<Point> die() {
+        isAlive = false;
         return tracer;
     }
 
 }
-
-
-
-
-
-

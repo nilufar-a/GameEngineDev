@@ -1,4 +1,4 @@
-package engine;/*package engine;
+/*package engine;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -7,19 +7,15 @@ import engine.Game;
 import engine.GameMap;
 import engine.Player;
 import engine.lobbystatepojo.LobbyState;
-import engine.mapeditorpojo.MapObject;
 
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
-import java.awt.*;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
-import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
-import java.util.Map;
 
 @Path("/")
 public class GamesContainer {
@@ -53,7 +49,7 @@ public class GamesContainer {
         LobbyState lobbyState = new Gson().fromJson(lobbyStateJson, LobbyState.class);
 
 
-        URL mapEditorURL = new URL("https://mapeditor-dot-trainingprojectlab2019.appspot.com/GetMap?MapID" + lobbyState.mapID);
+        URL mapEditorURL = new URL("https://mapeditor-dot-trainingprojectlab2019.appspot.com/GetMap?MapID=" + lobbyState.getMapID());
         HttpURLConnection mapEditorConnection = (HttpURLConnection) mapEditorURL.openConnection();
         mapEditorConnection.setRequestMethod("GET");
         mapEditorConnection.connect();
@@ -65,8 +61,8 @@ public class GamesContainer {
         MapObject mapObject = new Gson().fromJson(mapObjectJson, MapObject.class);
 
         ArrayList<Player> players = new ArrayList<>();
-        for (int i = 0; i < lobbyState.numberOfPlayers; i++) {
-            Player player = new Player(lobbyState.users.get(i).getID, lobbyState.users.get(i).getColor);
+        for (int i = 0; i < lobbyState.getNumberOfPlayers(); i++) {
+            Player player = new Player(lobbyState.getUsers().get(i).getUserID(), lobbyState.getUsers().get(i).getColor());
             players.add(player);
         }
         GameMap gameMap = new GameMap(mapObject.mapMatrix, players);
@@ -104,12 +100,12 @@ public class GamesContainer {
     @POST
     @Path("/postMove")
     @Produces(MediaType.TEXT_HTML)
-    public void postMove(@QueryParam("Direction") Direction direction, @QueryParam("UserID") int userID, @QueryParam("TurboFlag") boolean turboFlag) {
+    public void postMove(@QueryParam("Direction") Direction direction, @QueryParam("UserID") String userID, @QueryParam("TurboFlag") boolean turboFlag) {
         Game game = null;
         Player player = null;
         for (Player p : allPlayers
         ) {
-            if (p.getID() == userID) {
+            if (p.getID().equals(userID)) {
                 player = p;
                 game = player.getPlayingGame();
                 break;
@@ -119,5 +115,5 @@ public class GamesContainer {
             game.move(direction,player,turboFlag);
         }
     }
-}*/
-
+}
+*/
