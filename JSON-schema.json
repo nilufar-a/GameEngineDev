@@ -48,6 +48,10 @@
                 "score" : {
                     "description": "The score defined by the predefined formula",
                     "type" : "number"
+                },
+                "isAlive":{
+                    "description": "Players is alive or not",
+                    "type": "boolean"
                 }
             }
         }
@@ -67,7 +71,12 @@
             "description": "Current turn number",
             "type" : "integer"
         },
-       
+        "gameFinished":{
+         "description": "Is the game running or has it finished",
+         "type":"boolean"
+        },
+
+
         "map" : 
         {
             "description": "Current map of the game with the all obstacles, power-ups and player locations",
@@ -102,6 +111,7 @@
                 }                
             }
         },
+        
         "players" :
         {
             "description": "The player",
