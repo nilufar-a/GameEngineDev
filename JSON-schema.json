@@ -23,11 +23,11 @@
                     "description": "Player Identifier",
                     "type" : "integer"
                 },
-                "headPosition": { "$ref" : "#/defitions/point" },
+                "headPosition": { "$ref" : "#/definitions/point" },
                 "tracer" :{
                     "description": "the line that the player leaves behind",
                     "type" :"array",
-                    "items": { "$ref" : "#/defitions/point" }
+                    "items": { "$ref" : "#/definitions/point" }
                 } ,
                 "turboAmount" : {
                     "description": "the number of turbo powerups",
@@ -107,7 +107,7 @@
                 {
                     "description": "The location of the powerups",
                     "type" : "array",
-                    "items": { "$ref" : "#/defitions/point" }
+                    "items": { "$ref" : "#/definitions/point" }
                 }                
             }
         },
