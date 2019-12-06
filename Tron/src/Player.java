@@ -8,10 +8,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 
-enum Direction {
-    LEFT, RIGHT, UP, DOWN
-}
-
 public class Player {
     //   @SerializedName(value = "color")
     @Expose
@@ -50,6 +46,7 @@ public class Player {
     private boolean turboFlag;
     private Game playingGame;
 
+    private long startTime;
 
     public Player(String color, String ID) {
         this.color = color;
@@ -89,6 +86,10 @@ public class Player {
 
     public double getTimeElapsed() {
         return timeElapsed;
+    }
+
+    public void setTimeElapsed(double timeElapsed){
+        this.timeElapsed = timeElapsed;
     }
 
     public int getLength() {
@@ -357,7 +358,15 @@ public class Player {
 
     public List<Point> die() {
         isAlive = false;
+        timeElapsed = (System.currentTimeMillis() - startTime)/1000.0;
         return tracer;
     }
 
+    public long getStartTime() {
+        return startTime;
+    }
+
+    public void setStartTime(long startTime) {
+        this.startTime = startTime;
+    }
 }

@@ -24,7 +24,14 @@ public class Game extends Thread {
     private double timeToUpdate;
     private Thread thread;
     private boolean gameStarted;
+
+    @SerializedName(value = "gameFinished")
+    @Expose
     private boolean gameFinished;
+
+    @SerializedName(value = "turnCounter")
+    @Expose
+    private int turnCounter;
 
     private Runnable taskTurn;
     private ScheduledFuture<?> scheduledFuture;
@@ -45,37 +52,39 @@ public class Game extends Thread {
         gameFinished = false;
         thread = new Thread(this,Integer.toString(gameID));
         thread.start();
-        System.out.println(this.gameMap.toString());
     }
 
     public void run(){
         try {
-            System.out.println(gameID + " is created......");
-            AtomicInteger playerCounter = new AtomicInteger(0);
             ScheduledExecutorService ses = Executors.newScheduledThreadPool(1);
 
             taskTurn = () -> {
+                turnCounter++;
                 ArrayList<Player> temp= (ArrayList<Player>) listOfPlayers.clone();
                 for (Player player : temp
                 ) {
                     gameMap.move(player.getCurrentDirection(), player, player.isTurboFlag());
                 }
-                System.out.println(this.gameMap.toString());
             };
 
             //Time for synchronization
             Thread.sleep(10000);
             gameStarted=true;
 
+            //set start time for each player
+            for (Player player: listOfPlayers
+                 ) {
+                player.setStartTime(System.currentTimeMillis());
+            }
+
             scheduledFuture = ses.scheduleAtFixedRate(taskTurn, 1500, 1500, TimeUnit.MILLISECONDS);
             while (!gameFinished) {
                 timeToUpdate = scheduledFuture.getDelay(TimeUnit.MILLISECONDS);
             }
             scheduledFuture.cancel(false);
-            System.out.println("Game Finished");
+            Thread.sleep(120000);
         }
         catch (Exception ex){
-            System.out.println(ex.getStackTrace());
         }
     }
 

@@ -3,6 +3,10 @@ package engine;
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
+import java.io.IOException;
+import java.net.HttpURLConnection;
+import java.net.ProtocolException;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -198,13 +202,12 @@ public class GameMap {
         List<Point> deadTracer = player.die();
         for (Point p : deadTracer
         ) {
-            if(!collision){
+            if (!collision) {
                 mapMatrix[p.getX()][p.getY()] = "EMPTY";
                 int index = allPointsOnMap.indexOf(p); // incorrect need to change
                 allPointsOnMap.get(index).setState(State.EMPTY);
                 tracerLocations.remove(p);
-            }
-            else{
+            } else {
                 if (player.getHeadPosition().getY() != p.getY() || player.getHeadPosition().getX() != p.getX()) {
                     mapMatrix[p.getX()][p.getY()] = "EMPTY";
                     int index = allPointsOnMap.indexOf(p); // incorrect need to change
@@ -214,7 +217,6 @@ public class GameMap {
             }
 
 
-
         }
 
         calculateScore(player);
@@ -222,8 +224,15 @@ public class GameMap {
         deadPlayers.add(player); //Will use to get  who killed who
         //Need to implement score stuff and return here
         game.setListOfPlayers(playerList);
-        if(playerList.size()==0){
+        if (playerList.size() == 1) {
             game.setGameFinished(true);
+            try {
+                win(playerList.get(0));
+            }
+            catch (Exception ex){
+
+            }
+
         }
     }
 
@@ -257,6 +266,28 @@ public class GameMap {
         return map;
     }
 
+
+    public void win(Player player) throws IOException {
+        double timeElapsed = (System.currentTimeMillis() - player.getStartTime())/1000.0;
+        player.setTimeElapsed(timeElapsed);
+        calculateScore(player);
+        String requestParameter = "userID=" + player.getID() + "&score=" + player.getScore() + "&wins=1" + "&kills=" + player.getNumberOfKills() + "&timePlayed" + player.getTimeElapsed();
+        URL scoreBoardURL = new URL("https://scores-and-leaderboards-dot-trainingprojectlab2019.appspot.com/RegisterGame?userID=" + requestParameter);
+        HttpURLConnection mapEditorConnection = (HttpURLConnection) scoreBoardURL.openConnection();
+        mapEditorConnection.setRequestMethod("POST");
+        mapEditorConnection.connect();
+
+        for (Player p : deadPlayers
+        ) {
+            requestParameter = "userID=" + p.getID() + "&score=" + p.getScore() + "&wins=0" + "&kills=" + p.getNumberOfKills() + "&timePlayed" + p.getTimeElapsed();
+            scoreBoardURL = new URL("https://scores-and-leaderboards-dot-trainingprojectlab2019.appspot.com/RegisterGame?userID=" + requestParameter);
+            mapEditorConnection = (HttpURLConnection) scoreBoardURL.openConnection();
+            mapEditorConnection.setRequestMethod("POST");
+            mapEditorConnection.connect();
+        }
+
+
+    }
 
 }
 
