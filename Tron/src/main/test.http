@@ -1,0 +1,6 @@
+GET http://localhost:8080/GetCurrentStateOfModel?GameID=1;
+###
+POST http://localhost:8080/PostCreateGame?GameID=1;
+###
+POST https://game-engine-devs-dot-trainingprojectlab2019.appspot.com/PostMove?
+##

@@ -1,0 +1,22 @@
+POST http://localhost:8080/PostCreateGame?GameID=1;
+
+<> 2019-12-06T051607.500.html
+
+###
+
+POST http://localhost:8080/CreateGame?GameID=1;
+
+<> 2019-12-06T051459.404.html
+
+###
+
+GET http://localhost:8080/GetCurrentStateOfModel?GameID=1;
+
+<> 2019-12-06T051449.500.html
+
+###
+
+GET http://localhost:8080/GetCurrentStateOfModel?GameID=1;
+
+###
+
