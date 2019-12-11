@@ -2,20 +2,22 @@
 POST  PostMove
 IN: string Direction, string UserID, boolean TurboFlag
 OUT: 200= "OK" 
-ERR: 500="InternalServerError"
-     400= "No Game Found"
-     400= "Parse Direction"
-     400= "Parse UserID"
-     400= "Collision Occured"
-     404= "Illegal Move"
+ERR: 404= "No game/player found"
+     400= "Illegal direction"
+     400= "Invalid turbo flag"
+     
+    
 
 
 GET GetCurrentStateOfModel
 IN: int GameID
 OUT: 200 "OK" "GameState" -> JSON file (JSON-Schema for representation purposes)
+ERR: 404="Invalid game ID"
+     404="No such game was found"
 
 
 POST PostCreateGame
 IN: int GameID
 OUT: 200="OK"
-ERR: 500="InternalServerError"
+ERR: 500="Error initializing the map and or players"
+ERR: 404="Invalid Game ID"

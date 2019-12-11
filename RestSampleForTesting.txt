@@ -2,7 +2,7 @@ Endpoint: POST /CreateGame
 Use case:  Used for creating a new game.
 
 Input properties:
-JSON object
+Query Parameter
     {
         "GameID": int -- Game identification number e.g. 1;       
     }
@@ -11,14 +11,15 @@ Successful output properties:
 200 OK -- request has been processed successfully.
 
 Error output properties:
-400 BAD REQUEST -- No game found
+     500 INTERNAL SERVER ERROR -- "Error initializing the map and or players"
+     404 NOT FOUND -- "Invalid Game ID"
 
 Sample:
 POST /CreateGame
 Host: https://game-engine-devs-dot-trainingprojectlab2019.appspot.com/
-Content-Type: application/json
+Content-Length: 0
 {
-	"GameID": 200,	
+	https://game-engine-devs-dot-trainingprojectlab2019.appspot.com/CreateGame?GameID=1
 }
 
 Expected response: 200 OK
@@ -28,7 +29,7 @@ Endpoint: POST /PostMove
 Use case:  Used for inputting a new move.
 
 Input properties:
-JSON object
+Query Parameters
     {
         "Direction": string -- Direction of the move e.g UP ({UP,DWON,LEFT,RIGHT});
         "UserID": string -- User identification variable e.g. "XXX_420NoSCOPER_XXX";
@@ -39,16 +40,15 @@ Successful output properties:
 200 OK -- request has been processed successfully.
 
 Error output properties:
-400 BAD REQUEST -- No such player exists
-
+     404 NOT FOUND -- "No game/player found"
+     400 BAD REQUEST-- "Illegal direction"
+     400 BAD REQUEST-- "Invalid turbo flag"
 Sample:
 POST /PostMove
 Host: https://game-engine-devs-dot-trainingprojectlab2019.appspot.com/
-Content-Type: application/json
-{
-         "Direction": "UP",
-	 "UserID": "XXX_420NoSCOPER_XXX",
-         "TurboFlag": False,
+Content-Length: 0 
+{    
+     https://game-engine-devs-dot-trainingprojectlab2019.appspot.com/PostMove?Direction=UP&UserID=XXX_420NoSCOPER_XXX&TurboFlag=false
 }
 
 Expected response: 200 OK
@@ -65,8 +65,8 @@ Successful output properties:
 200 OK -- request has been processed successfully.
 
 Error output properties:
-400 BAD REQUEST -- No such game exists
-
+404 NOT FOUND -- "Invalid game ID"
+404 NOT FOUND -- "No such game was found"
 Sample:
 GEt /GetCurrentStateOfModel
 Host: https://game-engine-devs-dot-trainingprojectlab2019.appspot.com/
