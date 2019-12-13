@@ -62,8 +62,12 @@ public class Game extends Thread {
                 ArrayList<Player> temp= (ArrayList<Player>) listOfPlayers.clone();
                 for (Player player : temp
                 ) {
-                    gameMap.move(player.getCurrentDirection(), player, player.isTurboFlag());
+                    if(player.getNextDirectionToPlay()==null){
+                        player.setNextDirectionToPlay(player.getCurrentDirection());
+                    }
+                    gameMap.move(player.getNextDirectionToPlay(), player, player.isTurboFlag());
                 }
+                System.out.println(gameMap.toString());
             };
 
             //Time for synchronization
@@ -135,7 +139,7 @@ public class Game extends Thread {
 
     public void move(Direction direction, Player player, boolean turboFlag) {
         if(gameStarted) {
-            player.setCurrentDirection(direction);
+            player.setNextDirectionToPlay(direction);
             player.setTurboFlag(turboFlag);
         }
     }

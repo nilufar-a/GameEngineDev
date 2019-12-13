@@ -33,9 +33,9 @@ public class GamesContainer {
 
 
     public boolean createGame(int gameID) throws IOException {
-        boolean flag=true;
+        boolean flag = true;
         try {
-            URL matchMakingURL = new URL("https://match-making-dot-trainingprojectlab2019.appspot.com/GetLobbyState?GameID=" + gameID);
+            URL matchMakingURL = new URL("https://match-making-dot-trainingprojectlab2019.appspot.com//MatchMaking/GetLobbyState?GameID=" + gameID);
             HttpURLConnection matchMakingConnection = (HttpURLConnection) matchMakingURL.openConnection();
             matchMakingConnection.setRequestMethod("GET");
             matchMakingConnection.connect();
@@ -61,7 +61,7 @@ public class GamesContainer {
 
             ArrayList<Player> players = new ArrayList<>();
             for (int i = 0; i < lobbyState.getNumberOfPlayers(); i++) {
-                Player player = new Player(lobbyState.getUsers().get(i).getUserID(), lobbyState.getUsers().get(i).getColor().toString());
+                Player player = new Player(lobbyState.getUsers().get(i).getUserID(),"."); //lobbyState.getUsers().get(i).getColor().toString());
                 players.add(player);
             }
 
@@ -97,10 +97,16 @@ public class GamesContainer {
             ) {
                 mapMatrix[headPosition.getX()][headPosition.getY()] = "SPAWN";
             }
-            double turnInterval=lobbyState.getTurnInterval();
-            boolean cycleBehaviour=lobbyState.getCycleBehaviour();
-            GameMap gameMap = new GameMap(mapMatrix, players,turnInterval,cycleBehaviour);
+            double turnInterval = lobbyState.getTurnInterval();
+            boolean cycleBehaviour = lobbyState.getCycleBehaviour();
+            //initial directions because someone messed up with map editor
+            players.get(0).setCurrentDirection(Direction.LEFT);
+            players.get(1).setCurrentDirection(Direction.DOWN);
+            players.get(2).setCurrentDirection(Direction.UP);
+            players.get(3).setCurrentDirection(Direction.RIGHT);
+            GameMap gameMap = new GameMap(mapMatrix, players, turnInterval, cycleBehaviour);
             Game createdGame = new Game(gameID, gameMap, players);
+
 
             for (Player player : players
             ) {
@@ -108,10 +114,10 @@ public class GamesContainer {
             }
             allPlayers.addAll(players);
             games.add(createdGame);
-        }catch (Exception ex){
-            flag=false;
+        } catch (Exception ex) {
+            flag = false;
         }
-     return flag;
+        return flag;
     }
 
 
@@ -135,7 +141,7 @@ public class GamesContainer {
 
 
     public boolean postMove(Direction direction, String userID, boolean turboFlag) {
-        boolean flag=true;
+        boolean flag = true;
         Game game = null;
         Player player = null;
         for (Player p : allPlayers
@@ -144,18 +150,104 @@ public class GamesContainer {
                 player = p;
                 game = player.getPlayingGame();
                 break;
-            }else{
-                flag=false;
+            } else {
+                flag = false;
             }
         }
         if (game != null) {
             game.move(direction, player, turboFlag);
-        }else{
-            flag=false;
+        } else {
+            flag = false;
         }
 
 
-     return flag;
+        return flag;
     }
+
+    public boolean createGameMock() throws IOException {
+        boolean flag = true;
+        try {
+            String json = "{\"map\":{\"width\":\"20\",\n" +
+                    "\t\"height\":\"20\",\n" +
+                    "\t\"name\":\"New Map\",\n" +
+                    "\t\"obstacles\":[{\"x\":16,\"y\":3},{\"x\":15,\"y\":4},{\"x\":14,\"y\":5},{\"x\":13,\"y\":6},{\"x\":12,\"y\":7},{\"x\":11,\"y\":8},{\"x\":8,\"y\":11},{\"x\":7,\"y\":12},{\"x\":6,\"y\":13},{\"x\":5,\"y\":14},{\"x\":4,\"y\":15},{\"x\":3,\"y\":16}],\n" +
+                    "\t\"power-ups\":[{\"x\":3,\"y\":3},{\"x\":16,\"y\":16}]},\n" +
+                    "\t\"players\":[{\"headPosition\":{\"x\":9,\"y\":9},\"lookDirection\":\"LEFT\"},{\"headPosition\":{\"x\":10,\"y\":9},\"lookDirection\":\"UP\"},{\"headPosition\":{\"x\":9,\"y\":10},\"lookDirection\":\"DOWN\"},{\"headPosition\":{\"x\":10,\"y\":10},\"lookDirection\":\"RIGHT\"}]";
+            Gson gson = new Gson();
+
+            MapObject mapObject = gson.fromJson(json, MapObject.class);
+
+            String[][] mapMatrix = new String[mapObject.getMap().getHeight()][mapObject.getMap().getWidth()];
+            for (int i = 0; i < mapMatrix.length; i++) {
+                for (int j = 0; j < mapMatrix[0].length; j++) {
+                    mapMatrix[i][j] = "EMPTY";
+                }
+            }
+
+            //placing obstacles
+            List<Obstacle> obstacles = mapObject.getMap().getObstacles();
+            for (Obstacle obstacle : obstacles
+            ) {
+                mapMatrix[obstacle.getX()][obstacle.getY()] = "OBSTACLE";
+            }
+
+            //placing power-ups
+            List<PowerUp> powerUps = mapObject.getMap().getPowerUps();
+            for (PowerUp powerup : powerUps
+            ) {
+                mapMatrix[powerup.getX()][powerup.getY()] = "POWERUP";
+            }
+
+            //placing head positions
+            List<HeadPosition> headPositions = new ArrayList<>();
+            for (engine.mappojo.Player player : mapObject.getPlayers()
+            ) {
+                headPositions.add(player.getHeadPosition());
+            }
+            for (HeadPosition headPosition : headPositions
+            ) {
+                mapMatrix[headPosition.getX()][headPosition.getY()] = "SPAWN";
+            }
+
+
+            URL matchMakingURL = new URL("https://match-making-dot-trainingprojectlab2019.appspot.com//MatchMaking/GetLobbyState?GameID=-1");
+            HttpURLConnection matchMakingConnection = (HttpURLConnection) matchMakingURL.openConnection();
+            matchMakingConnection.setRequestMethod("GET");
+            matchMakingConnection.connect();
+            int matchMakingURLResponse = matchMakingConnection.getResponseCode();
+            if (matchMakingURLResponse != 200) {
+                throw new RuntimeException("HTTPResponseCode:" + matchMakingURLResponse);
+            }
+            BufferedReader lobbyStateJson = new BufferedReader(new InputStreamReader(matchMakingConnection.getInputStream()));
+            LobbyState lobbyState = new Gson().fromJson(lobbyStateJson, LobbyState.class);
+
+            ArrayList<Player> players = new ArrayList<>();
+            for (int i = 0; i < lobbyState.getNumberOfPlayers(); i++) {
+                Player player = new Player(lobbyState.getUsers().get(i).getUserID(), lobbyState.getUsers().get(i).getColor().toString());
+                players.add(player);
+            }
+
+            //setting the Initial directions
+            players.get(0).setCurrentDirection(Direction.LEFT);
+            players.get(1).setCurrentDirection(Direction.DOWN);
+            players.get(2).setCurrentDirection(Direction.UP);
+            players.get(3).setCurrentDirection(Direction.RIGHT);
+            double turnInterval = lobbyState.getTurnInterval();
+            boolean cycleBehaviour = lobbyState.getCycleBehaviour();
+            GameMap gameMap = new GameMap(mapMatrix, players, turnInterval, cycleBehaviour);
+            Game createdGame = new Game(-1, gameMap, players);
+
+            for (Player player : players
+            ) {
+                player.setPlayingGame(createdGame);
+            }
+            allPlayers.addAll(players);
+            games.add(createdGame);
+        }catch (Exception ex){
+            flag=false;
+        }
+        return flag;
+    }
+
 }
 

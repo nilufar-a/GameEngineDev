@@ -21,10 +21,19 @@ public class PostCreateGame extends HttpServlet {
         try {
             int gameID = Integer.parseInt(req.getParameter("GameID"));
             GamesContainer container = GamesContainer.getInstance();
-            if (container.createGame(gameID)) {
-                resp.setStatus(HttpServletResponse.SC_OK);
+
+            if (gameID != -1) {
+                if (container.createGame(gameID)) {
+                    resp.setStatus(HttpServletResponse.SC_OK);
+                } else {
+                    resp.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Error initializing the map and or players");
+                }
             } else {
-                resp.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR,"Error initializing the map and or players");
+                if (container.createGameMock()) {
+                    resp.setStatus(HttpServletResponse.SC_OK);
+                } else {
+                    resp.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Ran into error when starting");
+                }
             }
         } catch (NumberFormatException ex) {
             resp.sendError(HttpServletResponse.SC_NOT_FOUND, "Invalid Game ID");

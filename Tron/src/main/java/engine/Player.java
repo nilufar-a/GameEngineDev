@@ -46,8 +46,8 @@ public class Player {
 
     private boolean turboFlag;
     private Game playingGame;
-
     private long startTime;
+    private Direction nextDirectionToPlay;
 
     public Player(String ID, String color) {
         this.color = color;
@@ -113,7 +113,7 @@ public class Player {
         this.playingGame = playingGame;
     }
 
-    void setHeadPosition(Point position) {
+    void  setHeadPosition(Point position) {
         headPosition = position;
     }
 
@@ -137,15 +137,21 @@ public class Player {
         this.turboFlag = turboFlag;
     }
 
+    public Direction getNextDirectionToPlay() {
+        return nextDirectionToPlay;
+    }
+
+    public void setNextDirectionToPlay(Direction nextDirectionToPlay) {
+        this.nextDirectionToPlay = nextDirectionToPlay;
+    }
+
     boolean movePlayer(Direction direction, GameMap map) {
         tracer.add(headPosition);
+        nextDirectionToPlay=null;
         if (this.currentDirection == Direction.UP) {
             if (direction == Direction.UP || direction == Direction.DOWN) {
                 if (headPosition.getX() == 0) {
-
-
                     return false; // engine.Player dies by intersecting with upper border
-
                 }
 
                 int nextX = headPosition.getX() - 1;

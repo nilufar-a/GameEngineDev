@@ -13,7 +13,8 @@ import java.util.List;
 //IMPLEMENT CYCLE BEHAVIOUR
 //IMPLEMENT STARTING POSITION AND DIRECTION
 //IMPLEMENT HEAD TO HEAD COLLISION
-
+//IMPLEMENT MOCK(KHAZAR)
+// DONT POST SCORES OF PLAYERS WHERE USERNAME IS lIKE AI%
 
 
 public class GameMap {
@@ -45,14 +46,15 @@ public class GameMap {
     private Game game;
     private double turnInterval;
     private boolean cycleBehaviour;
-    public GameMap(String[][] i_mapMatrix, List<Player> players,double turnInterval,boolean cycleBehaviour) {
+
+    public GameMap(String[][] i_mapMatrix, List<Player> players, double turnInterval, boolean cycleBehaviour) {
 
         if (i_mapMatrix == null) {
             System.out.println("Unable to load the map.");
             return;
         }
-        this.turnInterval=turnInterval;
-        this.cycleBehaviour=cycleBehaviour;
+        this.turnInterval = turnInterval;
+        this.cycleBehaviour = cycleBehaviour;
         allPointsOnMap = new ArrayList<>();
         tracerLocations = new ArrayList<>();
         obstacleLocations = new ArrayList<>();
@@ -72,6 +74,7 @@ public class GameMap {
                 if (this.mapMatrix[i][j].equals("SPAWN") && playerCounter < playerList.size()) {
                     Player player = this.playerList.get(playerCounter++);
                     player.setHeadPosition(point);
+                    //player.setCurrentDirection(player.);
                     this.mapMatrix[i][j] = player.getID();
                 }
             }
@@ -170,6 +173,17 @@ public class GameMap {
 
     public void move(Direction direction, Player player, boolean turboPressed) {
 
+        boolean isAlive = false;
+        for (Player p : playerList
+        ) {
+            if (p.getID().equals(player.getID())) {
+                isAlive = true;
+            }
+        }
+        if (!isAlive) {
+            return;
+        }
+
         if (!turboPressed) {
             move(direction, player);
             calculateScore(player);
@@ -215,23 +229,36 @@ public class GameMap {
 
     public void die(Player player, boolean collision) { //Update it with turns so player will be out of the game
         List<Point> deadTracer = player.die();
-        for (Point p : deadTracer
-        ) {
-            if (!collision) {
-                mapMatrix[p.getX()][p.getY()] = "EMPTY";
-                int index = allPointsOnMap.indexOf(p); // incorrect need to change
-                allPointsOnMap.get(index).setState(State.EMPTY);
-                tracerLocations.remove(p);
-            } else {
-                if (player.getHeadPosition().getY() != p.getY() || player.getHeadPosition().getX() != p.getX()) {
+        if (cycleBehaviour) {
+            for (Point p : deadTracer
+            ) {
+                if (!collision) {
                     mapMatrix[p.getX()][p.getY()] = "EMPTY";
                     int index = allPointsOnMap.indexOf(p); // incorrect need to change
                     allPointsOnMap.get(index).setState(State.EMPTY);
                     tracerLocations.remove(p);
+                } else {
+                    if (player.getHeadPosition().getY() != p.getY() || player.getHeadPosition().getX() != p.getX()) {
+                        mapMatrix[p.getX()][p.getY()] = "EMPTY";
+                        int index = allPointsOnMap.indexOf(p); // incorrect need to change
+                        allPointsOnMap.get(index).setState(State.EMPTY);
+                        tracerLocations.remove(p);
+                    }
                 }
             }
+        }
 
+        calculateScore(player);
+        playerList.remove(player);
+        deadPlayers.add(player);
+        game.setListOfPlayers(playerList);
 
+        for (int i = 0; i < playerList.size(); i++) {
+            Player checkPlayer = playerList.get(i);
+            if (player.getHeadPosition().getX() == checkPlayer.getHeadPosition().getX() && player.getHeadPosition().getY() == checkPlayer.getHeadPosition().getY()) {
+                checkPlayer.getTracer().add(checkPlayer.getHeadPosition());
+                die(checkPlayer,false);
+            }
         }
 
         for (int i = 0; i < playerList.size(); i++) {
@@ -245,11 +272,7 @@ public class GameMap {
         }
 
 
-        calculateScore(player);
-        playerList.remove(player);
-        deadPlayers.add(player);
-        game.setListOfPlayers(playerList);
-        if (playerList.size() == 1) {
+        if (playerList.size() <= 1) {
             game.setGameFinished(true);
             try {
                 win(playerList.get(0));
@@ -295,22 +318,26 @@ public class GameMap {
         double timeElapsed = (System.currentTimeMillis() - player.getStartTime()) / 1000.0;
         player.setTimeElapsed(timeElapsed);
         calculateScore(player);
-        String requestParameter = "userID=" + player.getID() + "&score=" + player.getScore() + "&wins=1" + "&kills=" + player.getNumberOfKills() + "&timePlayed" + player.getTimeElapsed();
-        URL scoreBoardURL = new URL("https://scores-and-leaderboards-dot-trainingprojectlab2019.appspot.com/RegisterGame?userID=" + requestParameter);
-        HttpURLConnection scoreBoardConnection = (HttpURLConnection) scoreBoardURL.openConnection();
-        scoreBoardConnection.setRequestMethod("POST");
-        scoreBoardConnection.connect();
 
-        for (Player p : deadPlayers
-        ) {
-            requestParameter = "userID=" + p.getID() + "&score=" + p.getScore() + "&wins=0" + "&kills=" + p.getNumberOfKills() + "&timePlayed" + p.getTimeElapsed();
-            scoreBoardURL = new URL("https://scores-and-leaderboards-dot-trainingprojectlab2019.appspot.com/RegisterGame?userID=" + requestParameter);
-            scoreBoardConnection = (HttpURLConnection) scoreBoardURL.openConnection();
+        if(!player.getID().substring(0,2).equals("AI")) {
+            String requestParameter = "userID=" + player.getID() + "&score=" + player.getScore() + "&wins=1" + "&kills=" + player.getNumberOfKills() + "&timePlayed" + player.getTimeElapsed();
+            URL scoreBoardURL = new URL("https://scores-and-leaderboards-dot-trainingprojectlab2019.appspot.com/RegisterGame?userID=" + requestParameter);
+            HttpURLConnection scoreBoardConnection = (HttpURLConnection) scoreBoardURL.openConnection();
             scoreBoardConnection.setRequestMethod("POST");
             scoreBoardConnection.connect();
         }
+        for (Player p : deadPlayers
+        ) {
+            String aiName = p.getID().substring(0,2);
+            if (!aiName.equals("AI")) {
+                String   requestParameter = "userID=" + p.getID() + "&score=" + p.getScore() + "&wins=0" + "&kills=" + p.getNumberOfKills() + "&timePlayed" + p.getTimeElapsed();
+                URL scoreBoardURL = new URL("https://scores-and-leaderboards-dot-trainingprojectlab2019.appspot.com/RegisterGame?userID=" + requestParameter);
+                HttpURLConnection scoreBoardConnection = (HttpURLConnection) scoreBoardURL.openConnection();
+                scoreBoardConnection.setRequestMethod("POST");
+                scoreBoardConnection.connect();
+            }
 
-
+        }
     }
 
 }
