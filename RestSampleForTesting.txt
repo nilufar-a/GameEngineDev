@@ -1,4 +1,4 @@
-Endpoint: POST /CreateGame
+Endpoint: POST /PostCreateGame
 Use case:  Used for creating a new game.
 
 Input properties:
@@ -19,7 +19,7 @@ POST /CreateGame
 Host: https://game-engine-devs-dot-trainingprojectlab2019.appspot.com/
 Content-Length: 0
 {
-	https://game-engine-devs-dot-trainingprojectlab2019.appspot.com/CreateGame?GameID=1
+	https://game-engine-devs-dot-trainingprojectlab2019.appspot.com/PostCreateGame?GameID=1
 }
 
 Expected response: 200 OK
